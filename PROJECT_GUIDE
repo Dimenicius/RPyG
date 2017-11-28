@@ -1,0 +1,54 @@
+Refs:
+https://br.pinterest.com/pin/535154368201894855/
+
+### ROAD MAP ###
+
+- Alterar chmod.py para trabalhar com playersObj
+
+Run()
+  - getList()                     # Recupera a lista de characters criados
+  - findActive()                  # Encontra qual é o character ativo
+  - playIntro()                   # Executa a animação de introdução
+
+Menu()
+  - self.__init__()               # Inicialização da classe
+  - self.run()                    # Função principal
+    - self.checkEvents()          # Verifica eventos do pygame
+    - self.activeChar()           # Cria a surface de character ativo
+      - self.printActive()        # Helper para printar as informações
+
+CharModification()
+  - self.__init__()               # Inicialização da classe
+    - self.loadImages()           # Carrega todas as imagens utilizadas
+  - self.run()                    # Função principal
+    - self.statValues()           # Desenha valores dos stats
+    - self.drawButtons()          O Desenha os botões de [+] [-]
+      - self.drawStatButton()     # Helper
+    - self.drawStats()            # Desenha o nome dos stats
+    - self.drawConfirmation()     O Desenha os botões de confirmação
+    - self.drawTexts()            # Desenha textos em geral
+    - self.drawSkills()           # Desenha as skills
+      - self.drawIcons()          # Desenha os icones das skills
+        - self.skillTabButton()   # Helper [printar Abas]
+      - self.skillArrows()        O Cria as setas para gerenciamento de skills
+        - self.skillUp()          O Helper [printa as setas na tela]
+      - self.skillTexts()         # Helper [printar descrições]
+    - self.drawVisual()           O Desenha tela de equipamentos
+      - self.drawItemSlot()       # Helper [Desenhar slots]
+    - self.rightTabs()            # Botões SKILLS <-> EQUIPS
+    - self.changeButtons()        # Botões para selecionar outros personagens
+    - self.checkEvents()          # Verifica eventos do pygame
+      - self.accept()             # Cria string do char criado
+        - self.addToFile()        # Salva no arquivo
+      - self.activateButton()     # Ativador dos botões
+      - self.resetList()          # Deseleciona todos os personagens
+        - self.getList()          # Pega a lista de personagens
+      - self.manageSkill()        # Ativador dos botões de skill
+
+Skills()
+  - self.__init__()               # Inicialização da classe
+  - self.descBuilder()            # Helper para criar descrições
+
+Utils()
+  - self.drawSquare()             # Desenha quadrados semi-transparentes
+  - self.getMousePosition()       # Altera a posição do mouse
