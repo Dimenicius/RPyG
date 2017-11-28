@@ -2,7 +2,7 @@
 
 ### Running
 
-On RPyG folder ```python Run.py``` or ```python3 Run.py```
+In RPyG folder ```python Run.py``` or ```python3 Run.py```
 
 \* pygame required
 
@@ -40,3 +40,5 @@ On RPyG folder ```python Run.py``` or ```python3 Run.py```
 - [ ] Multi-player Connectivity
 
 **For explanations about code/functions see ```PROJECT_GUIDE```**
+
+**Do not own any rights of Character, Enemy and Items sprites, neither of any sounds and music. All of them are temporary**

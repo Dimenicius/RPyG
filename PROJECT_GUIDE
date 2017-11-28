@@ -1,9 +1,4 @@
-Refs:
-https://br.pinterest.com/pin/535154368201894855/
-
-### ROAD MAP ###
-
-- Alterar chmod.py para trabalhar com playersObj
+-- Precisa ser atualizado --
 
 Run()
   - getList()                     # Recupera a lista de characters criados

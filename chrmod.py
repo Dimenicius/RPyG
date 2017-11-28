@@ -45,7 +45,7 @@ class CharModification():
 
         self.smallFont = pygame.font.Font('font/Amiko-Regular.ttf', 10)
         self.smallTitle = pygame.font.Font('font/Amiko-Bold.ttf', 12)
-
+        self.activePlayer = None
         self.items = []
         self.attribs = []
         self.pointsleft = points
@@ -109,7 +109,8 @@ class CharModification():
 
         self.reloadStats()
         self.reloadSkills()
-        self.reloadInv()
+        if self.activePlayer:
+            self.reloadInv()
 
         self.imgIndex = self.imgFiles.index(self.img)
         self.loadImages()
