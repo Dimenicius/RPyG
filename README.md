@@ -3,6 +3,7 @@
 ### Running
 
 On RPyG folder ```python Run.py``` or ```python3 Run.py```
+*pygame required
 
 ### Road Map
 - [x] Main Menu
