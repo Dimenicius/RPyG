@@ -10,19 +10,6 @@ import maps
 Utils = utils.Utils()
 
 
-# lobby
-#     - show players
-#     - show gm[?]
-#     GM
-#         - create_battle
-#         - reward player
-#         - modify_ALL
-#
-#     Player
-#         - Inventario
-#         - CharModification
-
-
 class Lobby():
     def __init__(self, screen, active_char):
 

@@ -9,17 +9,34 @@ On RPyG folder ```python Run.py``` or ```python3 Run.py```
 ### Road Map
 - [x] Main Menu
 - [x] Character Creation
+  - [x] Attribute points
+  - [x] Skills points
+  - [x] Change visual
 - [x] Character Modification
+  - [x] Update char stats on level up
 - [x] Lobby
+- [ ] Inventory Management
+  - [x] Equip/Unequip Items
+  - [ ] Trade
+  - [ ] Rewards
 - [x] Map
+  - [x] Place Marks
+    - [x] Change image and name
 - [ ] Battle
   - [x] Turns
   - [x] Basic actions
   - [ ] Skills
     - [ ] Animations
     - [ ] Effects
+  - [ ] Sounds
+      - [x] Menu
+      - [x] Battle
+      - [x] Map
+      - [ ] Battle
 - [ ] Databases management
+    - [x] Basic formatting
+    - [x] Save/Retrieve data
     - [ ] Data compression
-- [ ] Multiplayer Connectivity
+- [ ] Multi-player Connectivity
 
 **For explanations about code/functions see ```PROJECT_GUIDE```**
