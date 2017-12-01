@@ -1,4 +1,4 @@
-# RPyG - An RPG game made in python
+# RPyG - A RPG game made in python
 
 ### Running
 
@@ -22,6 +22,7 @@ In RPyG folder ```python Run.py``` or ```python3 Run.py```
 - [x] Map
   - [x] Place Marks
     - [x] Change image and name
+- [ ] Store
 - [ ] Battle
   - [x] Turns
   - [x] Basic actions

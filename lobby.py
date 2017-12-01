@@ -1,3 +1,6 @@
+from PodSixNet.Connection import ConnectionListener, connection
+from time import sleep
+
 import pygame
 import utils
 import enemy
@@ -10,11 +13,16 @@ import maps
 Utils = utils.Utils()
 
 
-class Lobby():
-    def __init__(self, screen, active_char):
+# Clients
+
+
+class Lobby(ConnectionListener):
+    def __init__(self, screen, active_char, master=False):
 
         font = 'font/BEBAS.ttf'
         font_size = 20
+
+        self.master = master
 
         self.screen = screen
         self.active_char = active_char
@@ -22,10 +30,8 @@ class Lobby():
         self.mo_sound = pygame.mixer.Sound('sounds/mouse_over.ogg')
         self.mouse_click = pygame.mixer.Sound('sounds/click.ogg')
 
-        self.surface = pygame.Surface((400, 250), pygame.SRCALPHA, 32)
-
-        self.scr_width = self.surface.get_rect().width
-        self.scr_height = self.surface.get_rect().height
+        self.scr_width = self.screen.get_rect().width
+        self.scr_height = self.screen.get_rect().height
 
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(font, font_size)
@@ -37,12 +43,6 @@ class Lobby():
         self.last_mouseover = None
 
         self.mapa = None
-
-        self.chars.append(self.active_char)
-
-        for i in self.chars:
-            self.players.append(playerObj.Player(i))
-            self.players.append(playerObj.Player(0))
 
         self.background = pygame.image.load('sprites/lobby/lobby_bg.png')
 
@@ -57,6 +57,13 @@ class Lobby():
         self.reward = pygame.image.load('sprites/lobby/reward.png')
 
         self.mouse_over = pygame.image.load('sprites/lobby/mouse_over.png')
+
+        self.Connect()
+
+    def Network_addplayer(self, data):
+        player_id = data["char"]
+        self.players.append(playerObj.Player(player_id))
+        print('Jogador ' + str(player_id) + ' conectado')
 
     def drawButton(self, pos_x, pos_y, img=None, txt=None, size_x=130, size_y=130, txt_pos=90, sqr=True):
         rect = pygame.Rect(pos_x, pos_y, size_x, size_y)
@@ -78,17 +85,31 @@ class Lobby():
         self.screen.blit(text, (pos_x + text_x, pos_y))
 
     def drawCharButtons(self):
-        player = self.drawButton(10, 280, self.player, 'Player')
-        invent = self.drawButton(10, 420, self.inventory, 'Inventory')
+        if self.master:
+            player = self.drawButton(
+                self.scr_width, self.scr_height, self.player, 'Player')
+            invent = self.drawButton(
+                self.scr_width, self.scr_height, self.inventory, 'Inventory')
+        else:
+            player = self.drawButton(10, 280, self.player, 'Player')
+            invent = self.drawButton(10, 420, self.inventory, 'Inventory')
         worldmap = self.drawButton(660, 280, self.worldmap, 'Map')
         store = self.drawButton(660, 420, self.store, 'Store')
 
         return(player, invent, store, worldmap)
 
     def drawMasterButtons(self):
-        player = self.drawButton(195, 10, self.player, 'Chars')
-        battle = self.drawButton(335, 10, self.battle, 'Battle')
-        reward = self.drawButton(475, 10, self.reward, 'Reward')
+        if self.master:
+            player = self.drawButton(195, 10, self.player, 'Chars')
+            battle = self.drawButton(335, 10, self.battle, 'Battle')
+            reward = self.drawButton(475, 10, self.reward, 'Reward')
+        else:
+            player = self.drawButton(
+                self.scr_width, self.scr_height, self.player, 'Chars')
+            battle = self.drawButton(
+                self.scr_width, self.scr_height, self.battle, 'Battle')
+            reward = self.drawButton(
+                self.scr_width, self.scr_height, self.reward, 'Reward')
 
         return(player, battle, reward)
 
@@ -297,7 +318,15 @@ class Lobby():
         self.battleManager = False
         pygame.mixer.music.load('sounds/lobby.ogg')
         pygame.mixer.music.play(-1)
+
+        if not self.master:
+            self.chars.append(self.active_char)
+            self.Send({"action": "addplayer", "char": self.active_char})
+
         while mainloop:
+
+            connection.Pump()
+            self.Pump()
 
             self.screen.blit(self.background, (0, 0))
             self.drawChars()

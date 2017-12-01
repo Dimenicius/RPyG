@@ -3,11 +3,8 @@
 import pygame
 import menu
 import chrmod
-import battle
 import utils
-import random
 import player
-import enemy as enemyObj
 import lobby
 import maps
 
@@ -115,14 +112,13 @@ if __name__ == "__main__":
                         screen, 0, [0, 0, 0, 0, 0, 0, 0], Utils.getList('databases/players'), active_char, charmod=player.Player(active_char))
                 CM.run()
         elif choice == 2:
-            if not mapa:
-                mapa = maps.Map(screen)
-            mapa.run()
+            LB = lobby.Lobby(screen, active_char)
+            LB.run()
         elif choice == 3:
             # CM = chrmod.CharModification(
             #     screen, 0, [0, 0, 0, 0, 0, 0, 0], Utils.getList('databases/players'), active_char, 1)
             # CM.run()
-            LB = lobby.Lobby(screen, active_char)
+            LB = lobby.Lobby(screen, active_char, True)
             LB.run()
 
         elif choice == 'QUIT':
