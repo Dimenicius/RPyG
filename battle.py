@@ -10,7 +10,7 @@ Skills = skills.Skills()
 
 
 class Battle():
-    def __init__(self, screen, enemys, chars):
+    def __init__(self, screen, enemys, chars, Master=False):
 
         font = 'font/BEBAS.ttf'
         font_size = 20
@@ -22,6 +22,9 @@ class Battle():
         self.scr_height = self.screen.get_rect().height
 
         self.clock = pygame.time.Clock()
+
+        self.master = Master
+        self.myTurn = False
 
         self.font = pygame.font.Font(font, font_size)
         self.info_font = pygame.font.Font(font, font_info)
@@ -35,9 +38,19 @@ class Battle():
 
         self.chosenSkill = None
 
-        self.all = self.enemys + self.chars
+        self.all = self.chars + self.enemys
 
         self.enemyRects = []
+
+        global mainloop
+        mainloop = True
+        self.loadImages()
+
+        # self.turnRoll()
+
+        self.choosing_skill = False
+        self.chooseTarget = 0
+        self.TurnCounter = 0
 
     def loadImages(self):
         self.attackImg = pygame.image.load('sprites/battle/attack.png')
@@ -186,39 +199,61 @@ class Battle():
         self.chooseTarget = 0
         self.choosing_skill = False
         self.chosenSkill = None
-        self.currTurn = self.TurnCounter % len(self.all)
+        # self.currTurn = self.TurnCounter % len(self.all)
+        self.myTurn = False
+        self.sendData = {'action': 'passTurn'}
 
     def turnRoll(self):  # Sorteia ordem de turnos
         random.shuffle(self.all)
+
         return(self.all)
 
     def drawActionButtons(self):
         sqr_size = 130
         y_pos = 435
 
-        if self.chooseTarget == 0:
-            attack = pygame.Rect(125, y_pos, sqr_size, sqr_size)
-            skills = pygame.Rect(265, y_pos, sqr_size, sqr_size)
-            inventory = pygame.Rect(405, y_pos, sqr_size, sqr_size)
-            flee = pygame.Rect(545, y_pos, sqr_size, sqr_size)
+        if self.myTurn:
+            if self.chooseTarget == 0:
+                attack = pygame.Rect(125, y_pos, sqr_size, sqr_size)
+                skills = pygame.Rect(265, y_pos, sqr_size, sqr_size)
+                inventory = pygame.Rect(405, y_pos, sqr_size, sqr_size)
+                flee = pygame.Rect(545, y_pos, sqr_size, sqr_size)
 
-            cancel = pygame.Rect(
-                self.scr_width, self.scr_height, sqr_size, sqr_size)
+                cancel = pygame.Rect(
+                    self.scr_width, self.scr_height, sqr_size, sqr_size)
 
-            Utils.drawSquare(sqr_size, sqr_size, 125, y_pos, self.screen)
-            Utils.drawSquare(sqr_size, sqr_size, 265, y_pos, self.screen)
-            Utils.drawSquare(sqr_size, sqr_size, 405, y_pos, self.screen)
-            Utils.drawSquare(sqr_size, sqr_size, 545, y_pos, self.screen)
+                Utils.drawSquare(sqr_size, sqr_size, 125, y_pos, self.screen)
+                Utils.drawSquare(sqr_size, sqr_size, 265, y_pos, self.screen)
+                Utils.drawSquare(sqr_size, sqr_size, 405, y_pos, self.screen)
+                Utils.drawSquare(sqr_size, sqr_size, 545, y_pos, self.screen)
 
-            self.drawText('Attack', 125, 525)
-            self.drawText('Skills', 265, 525)
-            self.drawText('Inventory', 405, 525)
-            self.drawText('Flee', 545, 525)
+                self.drawText('Attack', 125, 525)
+                self.drawText('Skills', 265, 525)
+                self.drawText('Inventory', 405, 525)
+                self.drawText('Flee', 545, 525)
 
-            self.screen.blit(self.attack, (attack.left, attack.top))
-            self.screen.blit(self.skills, (skills.left, skills.top))
-            self.screen.blit(self.inventory, (inventory.left, inventory.top))
-            self.screen.blit(self.flee, (flee.left, flee.top))
+                self.screen.blit(self.attack, (attack.left, attack.top))
+                self.screen.blit(self.skills, (skills.left, skills.top))
+                self.screen.blit(
+                    self.inventory, (inventory.left, inventory.top))
+                self.screen.blit(self.flee, (flee.left, flee.top))
+            else:
+                attack = pygame.Rect(
+                    self.scr_width, self.scr_height, sqr_size, sqr_size)
+                skills = pygame.Rect(
+                    self.scr_width, self.scr_height, sqr_size, sqr_size)
+                inventory = pygame.Rect(
+                    self.scr_width, self.scr_height, sqr_size, sqr_size)
+                flee = pygame.Rect(
+                    self.scr_width, self.scr_height, sqr_size, sqr_size)
+
+                sqr_size = 260
+                sqr_x = (self.scr_width / 2 - sqr_size / 2)
+                cancel = pygame.Rect(sqr_x, y_pos + 75, sqr_size, 75)
+                Utils.drawSquare(sqr_size, 75,
+                                 sqr_x, y_pos + 75, self.screen)
+
+                self.drawText('Cancel', 340, 530)
         else:
             attack = pygame.Rect(
                 self.scr_width, self.scr_height, sqr_size, sqr_size)
@@ -229,13 +264,7 @@ class Battle():
             flee = pygame.Rect(
                 self.scr_width, self.scr_height, sqr_size, sqr_size)
 
-            sqr_size = 260
-            sqr_x = (self.scr_width / 2 - sqr_size / 2)
-            cancel = pygame.Rect(sqr_x, y_pos + 75, sqr_size, 75)
-            Utils.drawSquare(sqr_size, 75,
-                             sqr_x, y_pos + 75, self.screen)
-
-            self.drawText('Cancel', 340, 530)
+            cancel = pygame.Rect(self.scr_width, self.scr_height, sqr_size, 75)
 
         return(attack, skills, inventory, flee, cancel)
 
@@ -307,36 +336,34 @@ class Battle():
         if char_info == 0:
             self.charInfo(self.all[self.currTurn])
 
-    def run(self):
-        global mainloop
-        mainloop = True
-        self.loadImages()
-        self.turnRoll()
+    def run(self, myTurn, currTurn):
 
-        self.choosing_skill = False
-        self.chooseTarget = 0
-        self.TurnCounter = 0
+        # print(self.all[currTurn].name)
+        # print(currTurn)
 
-        while mainloop:
-            self.currTurn = self.TurnCounter % len(self.all)
-            while self.all[self.currTurn].isAlive() is False:
-                self.passTurn()
+        self.sendData = None
+        self.myTurn = myTurn
 
-            self.screen.blit(self.background, (0, 0))
+        self.currTurn = currTurn
+        while self.all[self.currTurn].isAlive() is False:
+            self.passTurn()
 
-            charsCollider = self.drawColliders(self.chars, 'sprites/chars/', 1)
-            enemysCollider = self.drawColliders(self.enemys, 'sprites/enemys/')
+        self.screen.blit(self.background, (0, 0))
 
-            attack, skills, inventory, flee, cancel = self.drawActionButtons()
+        charsCollider = self.drawColliders(self.chars, 'sprites/chars/', 1)
+        enemysCollider = self.drawColliders(self.enemys, 'sprites/enemys/')
 
-            if self.choosing_skill:
-                self.chooseSkill()
+        attack, skills, inventory, flee, cancel = self.drawActionButtons()
 
-            self.checkMouse(attack, skills, inventory, flee,
-                            charsCollider, enemysCollider, cancel)
+        if self.choosing_skill:
+            self.chooseSkill()
 
-            # Check Events and Refresh screen
-            self.checkEvents(attack, skills, inventory, flee,
-                             charsCollider, enemysCollider, cancel)
+        self.checkMouse(attack, skills, inventory, flee,
+                        charsCollider, enemysCollider, cancel)
 
-            pygame.display.flip()
+        # Check Events and Refresh screen
+        self.checkEvents(attack, skills, inventory, flee,
+                         charsCollider, enemysCollider, cancel)
+
+        pygame.display.flip()
+        return(self.sendData)

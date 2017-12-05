@@ -60,10 +60,41 @@ class Lobby(ConnectionListener):
 
         self.Connect()
 
+    # Network Functions
     def Network_addplayer(self, data):
         player_id = data["char"]
         self.players.append(playerObj.Player(player_id))
         print('Jogador ' + str(player_id) + ' conectado')
+
+    def Network_startbattle(self, data):
+
+        self.BATTLE = battleObj.Battle(
+            self.screen, self.enemys, self.players, self.master)
+
+        self.enemys = []
+        self.battleManager = False
+        self.Battle = True
+
+    def Network_addenemy(self, data):
+        sortNum = data['enemy']
+        temp = enemy.Enemy(sortNum)
+        self.enemys.append(temp)
+
+    def Network_isPlayer(self, data):
+
+        if self.master:
+            self.Send({"action": "isPlayer", "response": False,
+                       "channel": data["channel"]})
+        else:
+            self.Send({"action": "isPlayer", "response": True,
+                       "channel": data["channel"]})
+
+    def Network_yourTurn(self, data):
+        print(data)
+        self.myTurn = data["isTrue"]
+        self.currTurn = data["currTurn"]
+
+    # Draw functions
 
     def drawButton(self, pos_x, pos_y, img=None, txt=None, size_x=130, size_y=130, txt_pos=90, sqr=True):
         rect = pygame.Rect(pos_x, pos_y, size_x, size_y)
@@ -195,6 +226,13 @@ class Lobby(ConnectionListener):
 
         return(battle_cancel, battle_confirm, X, slots)
 
+    def drawChars(self):
+        for index, char in enumerate(self.players):
+            self.players[index].setPos((300 - 100 * index), (200 + 75 * index))
+            self.screen.blit(
+                self.players[index].imgFile, self.players[index].pos)
+
+    # Input functions
     def mouseCheck(self, player, invent, store, gm_player, battle, reward, worldmap):
         mouse_pos = Utils.getMousePosition(0, 0)
         if player.collidepoint(mouse_pos):
@@ -241,12 +279,11 @@ class Lobby(ConnectionListener):
 
                 for i in range(len(slots)):
                     if slots[i].collidepoint(mouse_pos):
-
                         enemy_list = Utils.getList('databases/enemys')
 
-                        sortNum = random.randint(0, len(enemy_list) - 1)
-                        temp = enemy.Enemy(sortNum)
-                        self.enemys.append(temp)
+                        self.Send(
+                            {"action": "addenemy", "enemy": random.randint(0, len(enemy_list) - 1)})
+
                         self.mo_sound.play()
 
                 if invent.collidepoint(mouse_pos):
@@ -272,13 +309,16 @@ class Lobby(ConnectionListener):
                     self.battleManager = False
                 elif battle_confirm.collidepoint(mouse_pos):
                     self.mouse_click.play()
-                    BATTLE = battleObj.Battle(
-                        self.screen, self.enemys, self.players)
 
-                    self.enemys = []
-                    self.battleManager = False
+                    self.Send({"action": "startbattle", 'data': True})
 
-                    BATTLE.run()
+                    # BATTLE = battleObj.Battle(
+                    #     self.screen, self.enemys, self.players)
+                    #
+                    # self.enemys = []
+                    # self.battleManager = False
+
+                    # BATTLE.run()
                 elif reward.collidepoint(mouse_pos):
                     self.mouse_click.play()
                 elif worldmap.collidepoint(mouse_pos):
@@ -305,19 +345,17 @@ class Lobby(ConnectionListener):
             if event.type == pygame.QUIT:
                 quit()
 
-    def drawChars(self):
-        for index, char in enumerate(self.players):
-            self.players[index].setPos((300 - 100 * index), (200 + 75 * index))
-            self.screen.blit(
-                self.players[index].imgFile, self.players[index].pos)
-
+    # Main Function
     def run(self):
+
         global mainloop
         mainloop = True
 
+        self.Battle = False
+
         self.battleManager = False
         pygame.mixer.music.load('sounds/lobby.ogg')
-        pygame.mixer.music.play(-1)
+        # pygame.mixer.music.play(-1)
 
         if not self.master:
             self.chars.append(self.active_char)
@@ -328,23 +366,28 @@ class Lobby(ConnectionListener):
             connection.Pump()
             self.Pump()
 
-            self.screen.blit(self.background, (0, 0))
-            self.drawChars()
+            if self.Battle is False:
+                self.screen.blit(self.background, (0, 0))
+                self.drawChars()
 
-            player, invent, store, worldmap = self.drawCharButtons()
+                player, invent, store, worldmap = self.drawCharButtons()
 
-            gm_player, battle, reward = self.drawMasterButtons()
+                gm_player, battle, reward = self.drawMasterButtons()
 
-            battle_cancel, battle_confirm, X, slots = self.drawBattleManager()
+                battle_cancel, battle_confirm, X, slots = self.drawBattleManager()
 
-            mouse_over = self.mouseCheck(player, invent, store, gm_player,
-                                         battle, reward, worldmap)
+                mouse_over = self.mouseCheck(player, invent, store, gm_player,
+                                             battle, reward, worldmap)
 
-            if not self.last_mouseover == mouse_over and mouse_over is not None:
-                self.last_mouseover = mouse_over
-                self.mo_sound.play()
+                if not self.last_mouseover == mouse_over and mouse_over is not None:
+                    self.last_mouseover = mouse_over
+                    self.mo_sound.play()
 
-            self.checkEvents(player, invent, store, gm_player,
-                             battle, reward, worldmap, battle_cancel, battle_confirm, X, slots)
+                self.checkEvents(player, invent, store, gm_player,
+                                 battle, reward, worldmap, battle_cancel, battle_confirm, X, slots)
 
-            pygame.display.flip()
+                pygame.display.flip()
+            else:
+                sentData = self.BATTLE.run(self.myTurn, self.currTurn)
+                if sentData is not None:
+                    self.Send(sentData)

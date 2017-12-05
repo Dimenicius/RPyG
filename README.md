@@ -2,7 +2,7 @@
 
 ### Running
 
-In RPyG folder ```python Run.py``` or ```python3 Run.py```
+In RPyG folder ```python Run.py``` or ```python2 Run.py```
 
 \* pygame required
 

@@ -121,7 +121,7 @@ class Menu():
         mainloop = True
         last_button = None
         pygame.mixer.music.load('sounds/menu.ogg')
-        pygame.mixer.music.play(-1)
+        # pygame.mixer.music.play(-1)
         while mainloop:
             self.screen.blit(self.background, (0, 0))
             self.surface.fill((0, 0, 0, 150))
