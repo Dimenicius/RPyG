@@ -6,7 +6,9 @@ import chrmod
 import utils
 import player
 import lobby
-import maps
+import os
+
+# os.environ["SDL_VIDEO_CENTERED"] = "1"
 
 Utils = utils.Utils()
 pygame.mixer.pre_init(44100, -16, 2, 2048)
